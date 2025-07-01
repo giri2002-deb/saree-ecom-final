@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import Shop from './components/Shop';
 import AdminPage from './pages/admin/AdminPage';
 import { Dashboard } from './components/admin/Dashboard';
+import { LoginForm } from './components/admin/LoginForm';
 
 const AppContent = () => {
   const location = useLocation();
@@ -20,8 +21,9 @@ const AppContent = () => {
       {!isAdmin && <Navbar />}
 
       <Routes>
+        <Route path="/admin/" element={<LoginForm onLoginSuccess={() => console.log("logged")} />} />
         <Route path="/admin/*" element={<AdminPage />} />
-       
+
         <Route path="/" element={<Home />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />

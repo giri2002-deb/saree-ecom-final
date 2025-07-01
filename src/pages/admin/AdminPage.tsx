@@ -9,6 +9,7 @@ import { ProductGrid } from '../../components/admin/ProductGrid';
 import { ProductModal } from '../../components/admin/ProductModal';
 import { ContentManagement } from '../../components/admin/ContentManagement';
 import { Product } from '../../types/admin';
+import SareeCollectionPage from './SareeCollectionPage';
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -89,6 +90,7 @@ export default function AdminPage() {
         <Routes>
           <Route path="/" element={<Navigate to="/admin/dashboard" />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="saree-collection" element={<SareeCollectionPage />} />
           <Route
             path="products"
             element={

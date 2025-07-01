@@ -1,0 +1,30 @@
+export interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  originalPrice: number;
+  image: string;
+  images: string[];
+  description: string;
+  features: string[];
+  isNew: boolean;
+  isFeatured: boolean;
+  rating: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductFormData {
+  name: string;
+  category: string;
+  price: string;
+  originalPrice: string;
+  image: string;
+  images: string[];
+  description: string;
+  features: string[];
+  isNew: boolean;
+  isFeatured: boolean;
+  rating: string;
+}

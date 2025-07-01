@@ -24,7 +24,8 @@ interface SidebarProps {
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'products', label: 'Saree Collection', icon: Package },
+  { id: 'saree-collection', label: 'Saree Collection', icon: Package },
+  { id: 'products', label: 'Products (Legacy)', icon: ShoppingCart },
   { id: 'orders', label: 'Orders', icon: ShoppingCart, badge: '5' },
   { id: 'calendar', label: 'Calendar', icon: Calendar },
   { id: 'users', label: 'Customers', icon: Users },
