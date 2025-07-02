@@ -8,7 +8,7 @@ import ProductSelector from '../../components/admin/ProductSelector';
 import SupabaseSetup from '../../components/admin/SupabaseSetup';
 import Toast from '../../components/admin/Toast';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = '';
 
 export default function SareeCollectionPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -47,7 +47,7 @@ export default function SareeCollectionPage() {
     setCurrentView('form');
   };
 
-  const handleDeleteProduct = async (id: string | number) => {
+  const handleDeleteProduct = async (id: number) => {
     try {
       const response = await fetch(`${API_URL}/api/sarees/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete product');

@@ -1,45 +1,45 @@
-import { useState } from 'react';
-import { Search, Plus, Filter, MoreVertical, Edit, Trash2, Eye, Heart } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Filter, Search, MoreVertical, Eye, Edit, Trash2, Heart } from 'lucide-react';
 import { Product } from '../../types/admin';
 
-interface ProductGridProps {
-  products: Product[];
-  onAddProduct: () => void;
-  onEditProduct: (product: Product) => void;
-  onDeleteProduct: (id: string) => void;
-  onViewProduct: (product: Product) => void;
-}
-
-export const ProductGrid = ({
-  products,
-  onAddProduct,
-  onEditProduct,
-  onDeleteProduct,
-  onViewProduct
-}: ProductGridProps) => {
+export const ProductGrid = () => {
+  const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+  const navigate = useNavigate();
+
   const categories = ['All', 'Silk Sarees', 'Cotton Sarees', 'Georgette Sarees', 'Banarasi Sarees', 'Designer Sarees', 'Net Sarees'];
   const colors = ['red', 'pink', 'blue', 'green', 'gold', 'silver', 'black', 'maroon', 'yellow', 'purple', 'orange', 'white'];
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('/api/sarees');
+        setProducts(response.data);
+      } catch (error) {
+        console.error('Failed to fetch sarees:', error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || selectedCategory === 'All' || product.category === selectedCategory;
     const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;
     const matchesColor = selectedColors.length === 0 || selectedColors.some(color => product.colors.includes(color));
-    
     return matchesSearch && matchesCategory && matchesPrice && matchesColor;
   });
 
   const handleColorToggle = (color: string) => {
-    setSelectedColors(prev => 
-      prev.includes(color) 
-        ? prev.filter(c => c !== color)
-        : [...prev, color]
+    setSelectedColors(prev =>
+      prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]
     );
   };
 
@@ -50,7 +50,34 @@ export const ProductGrid = ({
     setSelectedColors([]);
   };
 
+  // ✅ Handlers (These were missing!)
+  const handleAddProduct = () => {
+    navigate('/admin/saree-collection');
+  };
+
+  const onViewProduct = (product: Product) => {
+    navigate(`/product/${product.id}`);
+  };
+
+  const onEditProduct = (product: Product) => {
+    navigate(`/admin/saree-collection/edit/${product.id}`, { state: { product } });
+  };
+
+  const onDeleteProduct = async (id: string) => {
+    try {
+      await axios.delete(`/api/sarees/${id}`);
+      setProducts(prev => prev.filter(p => p.id !== id));
+    } catch (error) {
+      console.error('Failed to delete product:', error);
+    }
+  };
+//   const navigate = useNavigate();
+
+// const handleAddProduct = () => {
+//   navigate('/admin/saree-collection');
+// };
   return (
+    
     <div className="flex h-full bg-gradient-to-br from-pink-50 to-rose-50">
       {/* Filters Sidebar */}
       <div className="w-64 bg-white border-r border-pink-200 p-6 overflow-y-auto shadow-lg">
@@ -142,12 +169,13 @@ export const ProductGrid = ({
               Saree Collection
             </h2>
             <button
-              onClick={onAddProduct}
-              className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-lg font-medium hover:from-pink-600 hover:to-rose-600 transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              <Plus className="h-4 w-4" />
-              Add New Saree
-            </button>
+  onClick={handleAddProduct}
+  className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-lg font-medium hover:from-pink-600 hover:to-rose-600 transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+>
+  <Plus className="h-4 w-4" />
+  Add New Saree
+</button>
+
           </div>
 
           <div className="flex items-center gap-4">

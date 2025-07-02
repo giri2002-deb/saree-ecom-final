@@ -5,7 +5,7 @@ import { Product } from '../../types/Product';
 interface ProductTableProps {
   products: Product[];
   onEdit: (product: Product) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: number) => void;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
 }
@@ -15,7 +15,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onDelete,
   const [categoryFilter, setCategoryFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [showConfirmDelete, setShowConfirmDelete] = useState<string | null>(null);
+  const [showConfirmDelete, setShowConfirmDelete] = useState<number | null>(null);
 
   // Get unique categories
   const categories = Array.from(new Set(products.map(p => p.category)));
@@ -24,7 +24,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onDelete,
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.id.toLowerCase().includes(searchTerm.toLowerCase());
+                         product.id.toString().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || product.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
@@ -34,7 +34,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onDelete,
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: number) => {
     try {
       onDelete(id);
       onSuccess('Saree deleted successfully!');
@@ -332,7 +332,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onDelete,
                 Cancel
               </button>
               <button
-                onClick={() => handleDelete(showConfirmDelete)}
+                onClick={() => showConfirmDelete && handleDelete(showConfirmDelete)}
                 className="flex-1 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
               >
                 Delete

@@ -1,20 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Eye, ShoppingCart } from 'lucide-react';
-import { Saree } from '../data/sarees';
+import axios from 'axios';
 import { useCart } from '../context/CartContext';
+import { Saree } from '../data/sarees'; // Ensure this type matches your backend data
 
-interface ProductGridProps {
-  products: Saree[];
-  selectedFabric: string;
-}
-
-export default function ProductGrid({ products, selectedFabric }: ProductGridProps) {
+export default function ProductGrid() {
   const { dispatch } = useCart();
+  const [sarees, setSarees] = useState<Saree[]>([]);
+  const [selectedFabric, setSelectedFabric] = useState<string>('all');
+  const [loading, setLoading] = useState(true);
 
-  const filteredProducts = selectedFabric === 'all'
-    ? products
-    : products.filter((product) => product.fabric.toLowerCase() === selectedFabric.toLowerCase());
+  useEffect(() => {
+    const fetchSarees = async () => {
+      try {
+        const response = await axios.get<Saree[]>('http://localhost:5000/api/sarees');
+        setSarees(response.data);
+      } catch (error) {
+        console.error('Failed to fetch sarees:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSarees();
+  }, []);
 
   const addToCart = (product: Saree) => {
     dispatch({
@@ -29,24 +39,47 @@ export default function ProductGrid({ products, selectedFabric }: ProductGridPro
     });
   };
 
+  const filteredProducts = selectedFabric === 'all'
+    ? sarees
+    : sarees.filter(product => product.fabric.toLowerCase() === selectedFabric.toLowerCase());
+
   return (
     <section id="products-section" className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Fabric Filter */}
+        <div className="mb-8 flex justify-end">
+          <select
+            className="border px-4 py-2 rounded text-sm"
+            value={selectedFabric}
+            onChange={(e) => setSelectedFabric(e.target.value)}
+          >
+            <option value="all">All Fabrics</option>
+            {[...new Set(sarees.map(s => s.fabric))].map(fabric => (
+              <option key={fabric} value={fabric}>{fabric}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Title */}
         <div className="text-center mb-12">
           <h2 className="text-3xl lg:text-4xl font-light tracking-wide text-gray-900 mb-4">
             {selectedFabric === 'all' ? 'ALL SAREES' : `${selectedFabric.toUpperCase()} SAREES`}
           </h2>
-          <p className="text-gray-600">{filteredProducts.length} products found</p>
+          <p className="text-gray-600">
+            {loading ? 'Loading products...' : `${filteredProducts.length} products found`}
+          </p>
         </div>
 
+        {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filteredProducts.map((product) => (
+          {filteredProducts.map(product => (
             <div
               key={product.id}
               className="group relative bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300"
             >
+              {/* Image + Badges */}
               <div className="relative overflow-hidden">
-                {/* Badges */}
                 {product.originalPrice && (
                   <div className="absolute top-4 left-4 z-10">
                     <span className="bg-red-500 text-white px-3 py-1 text-xs font-medium rounded">SALE</span>
@@ -57,8 +90,6 @@ export default function ProductGrid({ products, selectedFabric }: ProductGridPro
                     <span className="bg-gray-800 text-white px-3 py-1 text-xs font-medium rounded">SOLD OUT</span>
                   </div>
                 )}
-
-                {/* Product image */}
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
                     src={product.image}
@@ -92,7 +123,6 @@ export default function ProductGrid({ products, selectedFabric }: ProductGridPro
                   <span className="text-xs text-gray-500 uppercase tracking-wide">{product.fabric}</span>
                 </div>
                 <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2">{product.name}</h3>
-
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     {product.originalPrice && (
@@ -102,6 +132,7 @@ export default function ProductGrid({ products, selectedFabric }: ProductGridPro
                   </div>
                 </div>
 
+                {/* Buttons */}
                 <div className="flex space-x-2">
                   <Link
                     to={`/product/${product.id}`}
@@ -112,7 +143,7 @@ export default function ProductGrid({ products, selectedFabric }: ProductGridPro
                   <button
                     onClick={() => addToCart(product)}
                     disabled={!product.inStock}
-                    className="flex-1 bg-black text-white py-2 px-4 text-xs font-medium hover:bg-gray-800 transition-colors duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center space-x-1 whitespace-nowrap"
+                    className="flex-1 bg-black text-white py-2 px-4 text-xs font-medium hover:bg-gray-800 transition-colors duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center space-x-1"
                   >
                     <ShoppingCart size={12} />
                     <span>ADD TO CART</span>
@@ -123,7 +154,8 @@ export default function ProductGrid({ products, selectedFabric }: ProductGridPro
           ))}
         </div>
 
-        {filteredProducts.length === 0 && (
+        {/* Empty state */}
+        {!loading && filteredProducts.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">No products found for {selectedFabric} fabric.</p>
           </div>

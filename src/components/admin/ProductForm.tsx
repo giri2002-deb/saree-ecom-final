@@ -11,7 +11,7 @@ export interface ProductFormProps {
   onFormSubmit?: () => void;
 }
 
-const API_URL = 'http://localhost:5000/api/sarees';
+const API_URL = '/api/sarees';
 
 const ProductForm: React.FC<ProductFormProps> = ({
   selectedProduct,
@@ -39,17 +39,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
   useEffect(() => {
     if (selectedProduct) {
       setFormData({
-        name: selectedProduct.name,
-        category: selectedProduct.category,
-        price: selectedProduct.price.toString(),
-        originalPrice: selectedProduct.originalPrice.toString(),
-        image: selectedProduct.image,
-        images: [...selectedProduct.images],
-        description: selectedProduct.description,
-        features: [...selectedProduct.features],
-        isNew: selectedProduct.isNew,
-        isFeatured: selectedProduct.isFeatured,
-        rating: selectedProduct.rating.toString()
+        name: selectedProduct.name || '',
+        category: selectedProduct.category || '',
+        price: selectedProduct.price !== undefined ? selectedProduct.price.toString() : '',
+        originalPrice: selectedProduct.originalPrice !== undefined ? selectedProduct.originalPrice.toString() : '',
+        image: selectedProduct.image || '',
+        images: selectedProduct.images ? [...selectedProduct.images] : [],
+        description: selectedProduct.description || '',
+        features: selectedProduct.features ? [...selectedProduct.features] : [],
+        isNew: selectedProduct.isNew || false,
+        isFeatured: selectedProduct.isFeatured || false,
+        rating: selectedProduct.rating !== undefined ? selectedProduct.rating.toString() : '5.0'
       });
     } else {
       resetForm();

@@ -1,15 +1,42 @@
-// src/pages/ShopPage.tsx
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { sarees, Saree, fabrics } from '../data/sarees';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useCart } from '../context/CartContext';
 import { ShoppingCart } from 'lucide-react';
 
+// Define Saree type if not imported
+interface Saree {
+  id: number;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  fabric: string;
+  rating?: number;
+  inStock: boolean;
+}
+
 export default function ShopPage() {
+  const [sarees, setSarees] = useState<Saree[]>([]);
   const [selectedFabric, setSelectedFabric] = useState<string>('All');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const { dispatch } = useCart();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchSarees = async () => {
+      try {
+        const response = await axios.get<Saree[]>('http://localhost:5000/api/sarees');
+        setSarees(response.data);
+      } catch (error) {
+        console.error('Error fetching sarees:', error);
+      }
+    };
+
+    fetchSarees();
+  }, []);
+
+  const fabrics = Array.from(new Set(sarees.map(s => s.fabric)));
 
   const filtered = sarees
     .filter((s) => selectedFabric === 'All' || s.fabric === selectedFabric)
@@ -30,7 +57,7 @@ export default function ShopPage() {
 
   const handleBuyNow = (product: Saree) => {
     addToCart(product);
-    navigate('/cart'); // Or go to a checkout page if you have one
+    navigate('/cart');
   };
 
   return (
@@ -88,7 +115,7 @@ export default function ShopPage() {
 
             <div
               className="p-4"
-              onClick={(e) => e.stopPropagation()} // Prevents card click from firing
+              onClick={(e) => e.stopPropagation()}
             >
               <h3 className="font-semibold text-md mb-1">{product.name}</h3>
               <p className="text-sm text-gray-500 mb-2">{product.fabric} Saree</p>
@@ -101,7 +128,7 @@ export default function ShopPage() {
               {product.rating && (
                 <div className="text-yellow-500 text-sm mb-3">⭐ {product.rating}</div>
               )}
-              <div className="flex space-x-2">
+               <div className="flex space-x-2">
                 <button
                   onClick={() => handleBuyNow(product)}
                   disabled={!product.inStock}
@@ -117,6 +144,8 @@ export default function ShopPage() {
                   <ShoppingCart size={12} />
                   <span>ADD TO CART</span>
                 </button>
+             
+          
               </div>
             </div>
           </div>

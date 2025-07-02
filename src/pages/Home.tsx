@@ -3,7 +3,7 @@ import Hero from '../components/Hero';
 import ShopByFabric from '../components/ShopByFabric';
 import ProductGrid from '../components/ProductGrid';
 import FeaturedProducts from '../components/FeaturedProducts';
-import { sarees } from '../data/sarees';
+
 import Footer from '../components/Footer';
 
 export default function Home() {
@@ -14,7 +14,7 @@ export default function Home() {
       <Hero />
       <FeaturedProducts />
     
-      <ProductGrid products={sarees} selectedFabric={selectedFabric} />
+      <ProductGrid  />
     
     </div>
   );

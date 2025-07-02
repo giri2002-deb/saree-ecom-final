@@ -4,7 +4,7 @@ import { Star } from 'lucide-react';
 import { sarees } from '../data/sarees';
 
 export default function FeaturedProducts() {
-  const featuredProducts = sarees.filter(product => product.rating >= 4.5).slice(0, 4);
+  const featuredProducts = sarees.filter(product => product.id >= 0).slice(0, 4);
 
   return (
     <section id="featured-section" className="py-16 bg-white">
@@ -37,7 +37,7 @@ export default function FeaturedProducts() {
                       key={i}
                       size={14}
                       className={`${
-                        i < Math.floor(product.rating)
+                        i < Math.floor(product.id)
                           ? 'text-yellow-400 fill-current'
                           : 'text-gray-300'
                       }`}
