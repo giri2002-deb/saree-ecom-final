@@ -16,12 +16,14 @@ export default function About() {
         {/* Saree Heritage Section */}
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
           <div>
-            <img
-              src="h1.jpg"
-              alt="Traditional saree weaving"
-              className="w-full h-auto rounded-lg shadow-lg"
-            />
-          </div>
+  <img
+    src="/ChatGPT Image Jul 9, 2025, 10_36_09 AM.png"
+    height={100}
+    alt="Traditional saree weaving"
+    className="w-full h-auto rounded-lg shadow-lg"
+  />
+</div>
+
           <div className="space-y-6">
             <h2 className="text-2xl font-light text-gray-900">The Heritage of Sarees</h2>
             <p className="text-gray-600 leading-relaxed">

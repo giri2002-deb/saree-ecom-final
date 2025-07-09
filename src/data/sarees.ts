@@ -11,7 +11,7 @@ export interface Saree {
   description: string;
   rating?: number;
   reviews?: number;
-  inStock: boolean;
+  inStock: number;
   features: string[];
   tags: string[];
   category: string;
@@ -45,7 +45,7 @@ export const sarees: Saree[] = [
     description: "A breathable and lightweight cotton saree perfect for daily wear.",
     rating: 4.5,
     reviews: 22,
-    inStock: true,
+    inStock: 10,
     features: ["Pure cotton", "Handwoven", "Soft texture"],
     tags: ["cotton", "handloom"],
     category: "daily",
@@ -61,7 +61,7 @@ export const sarees: Saree[] = [
     description: "Premium silk saree with golden zari work for special occasions.",
     rating: 4.8,
     reviews: 18,
-    inStock: true,
+    inStock: 12,
     features: ["Pure silk", "Zari work", "Elegant drape"],
     tags: ["silk", "premium", "occasion"],
     category: "party",
@@ -77,27 +77,27 @@ export const sarees: Saree[] = [
     description: "Exquisite bridal saree with intricate embroidery and zari work.",
     rating: 4.9,
     reviews: 35,
-    inStock: true,
+    inStock: 15,
     features: ["Heavy embroidery", "Pure silk", "Bridal collection"],
     tags: ["wedding", "bridal", "luxury"],
     category: "wedding",
-  },
-  {
-    id: 4,
-    name: "Georgette Printed Saree",
-    price: 1299,
-    originalPrice: 1599,
-    image: "/s4.jpg",
-    images: ["/s4.jpg", "/s8.jpg", "/s9.jpg"],
-    fabric: "Georgette",
-    description: "Lightweight georgette saree with beautiful prints for casual outings.",
-    rating: 4.3,
-    reviews: 15,
-    inStock: true,
-    features: ["Printed design", "Easy to drape", "Comfortable wear"],
-    tags: ["georgette", "printed", "casual"],
-    category: "daily",
-  },]
+  }]
+  // {
+  //   id: 4,
+  //   name: "Georgette Printed Saree",
+  //   price: 1299,
+  //   originalPrice: 1599,
+  //   image: "/s4.jpg",
+  //   images: ["/s4.jpg", "/s8.jpg", "/s9.jpg"],
+  //   fabric: "Georgette",
+  //   description: "Lightweight georgette saree with beautiful prints for casual outings.",
+  //   rating: 4.3,
+  //   reviews: 15,
+  //   inStock: true,
+  //   features: ["Printed design", "Easy to drape", "Comfortable wear"],
+  //   tags: ["georgette", "printed", "casual"],
+  //   category: "daily",
+  
 //   {
 //     id: 5,
 //     name: "Chiffon Party Saree",

@@ -11,6 +11,9 @@ import Shop from './components/Shop';
 import AdminPage from './pages/admin/AdminPage';
 import { Dashboard } from './components/admin/Dashboard';
 import { LoginForm } from './components/admin/LoginForm';
+import HeroSlideForm from './components/admin/HeroSlideForm';
+import FeaturedForm from './components/admin/FeturedForm';
+import CheckoutForm from './components/CheckoutForm';
 
 const AppContent = () => {
   const location = useLocation();
@@ -30,6 +33,9 @@ const AppContent = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/admin/hero" element={<HeroSlideForm />}/>
+           <Route path="/admin/fetured" element={<FeaturedForm />}/>
+           <Route path="/checkout" element={<CheckoutForm/>}/>
       </Routes>
 
       {!isAdmin && <Footer />}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X, Star, Tag, DollarSign } from 'lucide-react';
+import { Plus, X, Star, Tag, DollarSign, Boxes } from 'lucide-react';
 import { Product, ProductFormData } from '../../types/Product';
 import ImageUpload from './ImageUpload';
 
@@ -11,7 +11,7 @@ export interface ProductFormProps {
   onFormSubmit?: () => void;
 }
 
-const API_URL = '/api/sarees';
+const API_URL = 'http://localhost:5000/api/sarees';
 
 const ProductForm: React.FC<ProductFormProps> = ({
   selectedProduct,
@@ -30,7 +30,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
     features: [],
     isNew: false,
     isFeatured: false,
-    rating: '5.0'
+    rating: '5.0',
+    stack: 0
   });
 
   const [currentFeature, setCurrentFeature] = useState('');
@@ -39,30 +40,35 @@ const ProductForm: React.FC<ProductFormProps> = ({
   useEffect(() => {
     if (selectedProduct) {
       setFormData({
-        name: selectedProduct.name || '',
+        name: selectedProduct.name,
         category: selectedProduct.category || '',
-        price: selectedProduct.price !== undefined ? selectedProduct.price.toString() : '',
-        originalPrice: selectedProduct.originalPrice !== undefined ? selectedProduct.originalPrice.toString() : '',
-        image: selectedProduct.image || '',
-        images: selectedProduct.images ? [...selectedProduct.images] : [],
-        description: selectedProduct.description || '',
-        features: selectedProduct.features ? [...selectedProduct.features] : [],
-        isNew: selectedProduct.isNew || false,
-        isFeatured: selectedProduct.isFeatured || false,
-        rating: selectedProduct.rating !== undefined ? selectedProduct.rating.toString() : '5.0'
+        price: selectedProduct.price.toString(),
+        originalPrice: selectedProduct.originalPrice?.toString() || '',
+        image: selectedProduct.image,
+        images: selectedProduct.images || [],
+        description: selectedProduct.description,
+        features: selectedProduct.features || [],
+        isNew: selectedProduct.isNew,
+        isFeatured: selectedProduct.isFeatured,
+        rating: selectedProduct.rating.toString(),
+        stack: selectedProduct.stack || 0
       });
     } else {
       resetForm();
     }
   }, [selectedProduct]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox'
         ? (e.target as HTMLInputElement).checked
-        : value
+        : name === 'stack'
+          ? parseInt(value)
+          : value
     }));
   };
 
@@ -106,6 +112,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
       errors.push('Valid original price is required');
     if (parseFloat(formData.price) > parseFloat(formData.originalPrice))
       errors.push('Current price cannot be higher than original price');
+    if (formData.stack < 0 || isNaN(formData.stack))
+      errors.push('Valid stock quantity is required');
     if (!formData.description.trim()) errors.push('Description is required');
     if (formData.images.length === 0) errors.push('At least one saree image is required');
 
@@ -145,6 +153,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           isNew: formData.isNew,
           isFeatured: formData.isFeatured,
           rating: parseFloat(formData.rating),
+          stack: formData.stack,
           ...(isEdit && { id: selectedProduct.id })
         })
       });
@@ -153,9 +162,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
       onSuccess(isEdit ? 'Saree updated successfully!' : 'Saree added successfully!');
 
-      if (!isEdit) {
-        resetForm();
-      }
+      if (!isEdit) resetForm();
     } catch (error) {
       console.error('Error saving product:', error);
       onError('Failed to save saree. Please try again.');
@@ -176,7 +183,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
       features: [],
       isNew: false,
       isFeatured: false,
-      rating: '5.0'
+      rating: '5.0',
+      stack: 0
     });
     setCurrentFeature('');
   };
@@ -199,32 +207,29 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Basic Information */}
           <div className="space-y-4">
+            {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Saree Name *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Saree Name *</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                 placeholder="Enter saree name"
                 required
               />
             </div>
 
+            {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                 required
               >
                 <option value="">Select category</option>
@@ -239,59 +244,60 @@ const ProductForm: React.FC<ProductFormProps> = ({
               </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Price, Original Price, Stack */}
+            <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <DollarSign className="inline h-4 w-4 mr-1" />
-                  Current Price (₹) *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Current Price (₹) *</label>
                 <input
                   type="number"
                   name="price"
                   value={formData.price}
                   onChange={handleInputChange}
-                  step="1"
-                  min="0"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
-                  placeholder="0"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                   required
                 />
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Original Price (₹) *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Original Price (₹) *</label>
                 <input
                   type="number"
                   name="originalPrice"
                   value={formData.originalPrice}
                   onChange={handleInputChange}
-                  step="1"
-                  min="0"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
-                  placeholder="0"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Stock Quantity *</label>
+                <input
+                  type="number"
+                  name="stack"
+                  value={formData.stack}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                   required
                 />
               </div>
             </div>
 
+            {/* Rating */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Star className="inline h-4 w-4 mr-1" />
-                Rating
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
               <input
                 type="number"
                 name="rating"
                 value={formData.rating}
                 onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                 step="0.1"
-                min="0"
                 max="5"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
               />
             </div>
 
+            {/* Checkboxes */}
             <div className="flex items-center space-x-6">
               <label className="flex items-center">
                 <input
@@ -299,9 +305,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   name="isNew"
                   checked={formData.isNew}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
+                  className="h-4 w-4 text-pink-600 border-gray-300"
                 />
-                <span className="ml-2 text-sm text-gray-700">New Arrival</span>
+                <span className="ml-2 text-sm">New Arrival</span>
               </label>
               <label className="flex items-center">
                 <input
@@ -309,43 +315,36 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   name="isFeatured"
                   checked={formData.isFeatured}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
+                  className="h-4 w-4 text-pink-600 border-gray-300"
                 />
-                <span className="ml-2 text-sm text-gray-700">Featured</span>
+                <span className="ml-2 text-sm">Featured</span>
               </label>
             </div>
           </div>
 
-          {/* Images Section */}
+          {/* Image Upload */}
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Saree Images *
-              </label>
-             <ImageUpload
-  images={formData.images}
-  onImagesChange={handleImagesChange}
-  mainImage={formData.image}
-  onMainImageChange={handleMainImageChange}
-  onSuccess={onSuccess}   // Pass down your onSuccess handler
-  onError={onError}       // Pass down your onError handler
-/>
-
-            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Saree Images *</label>
+            <ImageUpload
+              images={formData.images}
+              onImagesChange={handleImagesChange}
+              mainImage={formData.image}
+              onMainImageChange={handleMainImageChange}
+              onSuccess={onSuccess}
+              onError={onError}
+            />
           </div>
         </div>
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Description *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleInputChange}
             rows={4}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg"
             placeholder="Enter detailed saree description"
             required
           />
@@ -353,27 +352,25 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
         {/* Features */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Saree Features
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Saree Features</label>
           <div className="flex gap-2 mb-3">
             <input
               type="text"
               value={currentFeature}
               onChange={(e) => setCurrentFeature(e.target.value)}
               onKeyPress={handleFeatureKeyPress}
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
-              placeholder="Add a saree feature (e.g., Pure Silk, Zari Work)"
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg"
+              placeholder="e.g., Pure Silk, Zari Work"
             />
             <button
               type="button"
               onClick={addFeature}
-              className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 transition-all duration-200 flex items-center"
+              className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
               <Plus className="h-4 w-4" />
             </button>
           </div>
-          
+
           {formData.features.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {formData.features.map((feature, index) => (
@@ -385,7 +382,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   <button
                     type="button"
                     onClick={() => removeFeature(index)}
-                    className="ml-2 p-1 hover:bg-pink-200 rounded-full transition-colors duration-200"
+                    className="ml-2 p-1 hover:bg-pink-200 rounded-full"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -395,24 +392,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
           )}
         </div>
 
-        {/* Submit Button */}
+        {/* Submit */}
         <div className="flex justify-end pt-4">
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`px-8 py-3 rounded-lg font-medium text-white transition-all duration-200 ${
+            className={`px-8 py-3 rounded-lg font-medium text-white ${
               isSubmitting
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2'
+                : 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700'
             }`}
           >
-            {isSubmitting ? (
-              'Saving...'
-            ) : selectedProduct ? (
-              'Update Saree'
-            ) : (
-              'Add Saree'
-            )}
+            {isSubmitting ? 'Saving...' : selectedProduct ? 'Update Saree' : 'Add Saree'}
           </button>
         </div>
       </form>

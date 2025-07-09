@@ -10,6 +10,7 @@ export interface Product {
   features: string[];
   isNew: boolean;
   isFeatured: boolean;
+  stack:number;
   rating: number;
   createdAt: string;
   updatedAt: string;
@@ -27,4 +28,5 @@ export interface ProductFormData {
   isNew: boolean;
   isFeatured: boolean;
   rating: string;
+  stack:number;
 }
