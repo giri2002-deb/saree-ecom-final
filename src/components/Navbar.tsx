@@ -92,7 +92,7 @@ export default function Navbar() {
           <div className="md:hidden border-t border-gray-100 py-4">
             <div className="flex flex-col space-y-4">
               <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-sm font-medium text-gray-600 hover:text-black">HOME</Link>
-              <button onClick={handleShopClick} className="text-left text-sm font-medium text-gray-600 hover:text-black">SHOP</button>
+             <Link to="/shop" onClick={() => setIsMenuOpen(false)} className="text-sm font-medium text-gray-600 hover:text-black">SHOP</Link>
               <Link to="/about" onClick={() => setIsMenuOpen(false)} className="text-sm font-medium text-gray-600 hover:text-black">ABOUT</Link>
               <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="text-sm font-medium text-gray-600 hover:text-black">CONTACT</Link>
             </div>
